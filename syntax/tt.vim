@@ -307,13 +307,12 @@ syntax region ttValueBlock
 			\ matchgroup=ttBracesValue start=/{/ end=/}/
 			\ contained
 			\ contains=ttValueBlock
-" Split
+
 syntax region ttSplitValueBlock
 			\ matchgroup=ttBracesValue start=/{/ end=/}/
 			\ contained skipwhite skipempty
 			\ nextgroup=ttValueBlock
 
-" Parse
 syntax region ttParseValueBlock
 			\ matchgroup=ttBracesValue start=/{/ end=/}/
 			\ contained skipwhite skipempty
