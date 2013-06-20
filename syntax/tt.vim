@@ -1,11 +1,11 @@
 " VIM Syntax file for tintin++ scripts
 " TODO
-" Make #script more robust
 " Add proper support for #chat
 " Add proper support for #map
 " Finish support for #buffer get
 " Make Better use of Clusters
-" More Robust #script support
+" Porper #script support, I feel none is better than the fragile support from
+" before
 " Test vs various code styles
 " Add bad syntax highlights to ttError
 
@@ -62,7 +62,7 @@ syntax keyword ttCmd #pathdir
 syntax keyword ttCmd #end #suspend
 
 syntax keyword ttCmd #zap
-			\ nextgroup=ttSessionName
+			\ nextgroup=ttSessionName,ttSessionNameBlock
 			\ skipwhite skipempty
 " }}}
 " Session Related: #all #gts #snoop #session #run {{{
@@ -70,11 +70,11 @@ syntax keyword ttCmd #all #gts
 syntax match   ttCmd "\c#{gts}"
 
 syntax keyword ttCmd #snoop
-			\ nextgroup=ttSessionName
+			\ nextgroup=ttSessionName,ttSessionNameBlock
 			\ skipwhite skipempty
 
 syntax keyword ttCmd #ses[sion]
-			\ nextgroup=ttSessionNameBlock,ttSessionName
+			\ nextgroup=ttSesSessionNameBlock,ttSesSessionName
 			\ skipwhite skipempty
 
 syntax keyword ttCmd #run
@@ -245,13 +245,7 @@ syntax match ttCmdRep "#\d\+"
 syntax match ttCmdRep "#{\d\+}"
 " }}}
 " #script is handled in a special way {{{
-syntax region ttCmdScriptBlock start=/#script\>/ skip=/}\_s\+{\|$/ end=/}$\|};$/
-			\ contains=ttCmdScript,ttShellCmd,ttScriptVarName,ttCmdSep
-			\ keepend
-
 syntax keyword ttCmdScript #script
-			\ contained
-
 " }}}
 
 syntax keyword ttCmd #map
@@ -397,6 +391,12 @@ syntax region ttFunctionNameBlock
 			\ contained
 " }}}
 " Variable Name Block {{{
+syntax match ttVarVar "[^ ;]\+"
+			\ contained
+			\ contains=ttVarIndex
+			\ skipwhite
+			\ nextgroup=ttValueBlock
+
 syntax region ttVarVarBlock
 			\ matchgroup=ttBraces start=/{/ end=/}/
 			\ contained
@@ -404,11 +404,11 @@ syntax region ttVarVarBlock
 			\ skipwhite
 			\ nextgroup=ttValueBlock
 
-syntax match ttVarVar "[\[\]0-9A-Za-z_]\+"
+syntax match ttFormatVar "[^ ;]\+"
 			\ contained
 			\ contains=ttVarIndex
 			\ skipwhite
-			\ nextgroup=ttValueBlock
+			\ nextgroup=ttFormatBlock
 
 syntax region ttFormatVarBlock
 			\ matchgroup=ttBraces start=/{/ end=/}/
@@ -417,11 +417,11 @@ syntax region ttFormatVarBlock
 			\ skipwhite skipempty
 			\ nextgroup=ttFormatBlock
 
-syntax match ttFormatVar "[\[\]0-9A-Za-z_]\+"
+syntax match ttMathVar "[^ ;]\+"
 			\ contained
 			\ contains=ttVarIndex
 			\ skipwhite
-			\ nextgroup=ttFormatBlock
+			\ nextgroup=ttExpressionBlock
 
 syntax region ttMathVarBlock
 			\ matchgroup=ttBraces start=/{/ end=/}/
@@ -430,11 +430,11 @@ syntax region ttMathVarBlock
 			\ skipwhite skipempty
 			\ nextgroup=ttExpressionBlock
 
-syntax match ttMathVar "[\[\]0-9A-Za-z_]\+"
+syntax match ttMRegexVar "[^ ;]\+"
 			\ contained
 			\ contains=ttVarIndex
 			\ skipwhite
-			\ nextgroup=ttExpressionBlock
+			\ nextgroup=ttFormatBlock
 
 syntax region ttRegexVarBlock
 			\ matchgroup=ttBraces start=/{/ end=/}/
@@ -443,11 +443,11 @@ syntax region ttRegexVarBlock
 			\ skipwhite skipempty
 			\ nextgroup=ttPatternBlock
 
-syntax match ttMRegexVar "[\[\]0-9A-Za-z_]\+"
+syntax match ttReplaceVar "[^ ;]\+"
 			\ contained
 			\ contains=ttVarIndex
 			\ skipwhite
-			\ nextgroup=ttFormatBlock
+			\ nextgroup=ttReplaceFormatBlock
 
 syntax region ttReplaceVarBlock
 			\ matchgroup=ttBraces start=/{/ end=/}/
@@ -456,11 +456,11 @@ syntax region ttReplaceVarBlock
 			\ skipwhite skipempty
 			\ nextgroup=ttReplaceFormatBlock
 
-syntax match ttReplaceVar "[\[\]0-9A-Za-z_]\+"
+syntax match ttListVar "[^ ;]\+"
 			\ contained
 			\ contains=ttVarIndex
 			\ skipwhite
-			\ nextgroup=ttReplaceFormatBlock
+			\ nextgroup=ttListSub
 
 syntax region ttListVarBlock
 			\ matchgroup=ttBraces start=/{/ end=/}/
@@ -469,7 +469,7 @@ syntax region ttListVarBlock
 			\ skipwhite skipempty
 			\ nextgroup=ttListSub
 
-syntax match ttListVar "[\[\]0-9A-Za-z_]\+"
+syntax match ttPathVar "[^ ;]\+"
 			\ contained
 			\ contains=ttVarIndex
 			\ skipwhite
@@ -481,12 +481,6 @@ syntax region ttPathVarBlock
 			\ contains=ttVarIndex
 			\ skipwhite skipempty
 			\ nextgroup=ttListSub
-
-syntax match ttPathVar "[\[\]0-9A-Za-z_]\+"
-			\ contained
-			\ contains=ttVarIndex
-			\ skipwhite
-			\ nextgroup=ttListSub
 " }}}
 " Ticker/Delay Name {{{
 syntax region ttTimeNameBlock
@@ -494,68 +488,68 @@ syntax region ttTimeNameBlock
 			\ contained
 " }}}
 " Class Blocks {{{
+syntax match ttClassName "[^ ;]\+"
+			\ contained
+			\ skipwhite
+			\ nextgroup=ttClassSub1,ttClassSub2
+
 syntax region ttClassNameBlock
 			\ matchgroup=ttBraces start=/{/ end=/}/
 			\ contained
 			\ skipwhite
 			\ nextgroup=ttClassSub1,ttClassSub2
 
-syntax match ttClassName "\<\S\+\>"
-			\ contained
-			\ skipwhite
-			\ nextgroup=ttClassSub1,ttClassSub2
-
-syntax match ttClassSub1 "\%[{]\(open\|close\|kill\)\%[}]"
+syntax match ttClassSub1 "\c\%[{]\(open\|close\|kill\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 
-syntax match ttClassSub2 "\%[{]\(read\|write\)\%[}]"
+syntax match ttClassSub2 "\c\%[{]\(read\|write\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
 			\ nextgroup=ttFileNameBlock,ttFileName
 " }}}
 " List Block {{{ 
-syntax match ttListSub "\%[{]\(add\|cl\%[ear]\|create\|del\%[ete]\|ins\%[ert]\|get\|set\|size\|sort\)\%[}]"
+syntax match ttListSub "\c\%[{]\(add\|cl\%[ear]\|create\|del\%[ete]\|ins\%[ert]\|get\|set\|size\|sort\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 " }}}
 " Path Block {{{ 
-syntax match ttPathSub1 "\%[{]\(end\|del\|new\|run\|show\|walk\|zip\|unzip\)\%[}]"
+syntax match ttPathSub1 "\c\%[{]\(end\|del\|new\|run\|show\|walk\|zip\|unzip\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 
-syntax match ttPathSub2 "\%[{]\(load\|save\)\%[}]"
+syntax match ttPathSub2 "\c\%[{]\(load\|save\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
 			\ nextgroup=ttPathVarBlock,ttPathVar
 
-syntax match ttPathSub3 "\%[{]\(ins\%[ert]\)\%[}]"
+syntax match ttPathSub3 "\c\%[{]\(ins\%[ert]\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
 			\ nextgroup=ttValueBlock
 " }}}
 " Log Block {{{ 
-syntax match ttLogSub "\%[{]\(a\%[ppend]\|ov\%[erwrite]\|of\%[f]\)\%[}]"
+syntax match ttLogSub "\c\%[{]\(a\%[ppend]\|ov\%[erwrite]\|of\%[f]\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
 			\ nextgroup=ttFileNameBlock,ttFileName
 " }}}
 " Buffer Block {{{ 
-syntax match ttBufferSub1 "\%[{]\(clear\|down\|end\|find\|home\|info\|lock\|up\)\%[}]"
+syntax match ttBufferSub1 "\c\%[{]\(clear\|down\|end\|find\|home\|info\|lock\|up\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 
-syntax match ttBufferSub2 "\%[{]write\%[}]"
+syntax match ttBufferSub2 "\c\%[{]write\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
 			\ nextgroup=ttFileNameBlock,ttFileName
 
-syntax match ttBufferSub3 "\%[{]get\%[}]"
+syntax match ttBufferSub3 "\c\%[{]get\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
@@ -573,16 +567,28 @@ syntax region ttCursorBlock
 			\ nextgroup=ttKeyBlock
 " }}}
 "Session/Run Name Blocks {{{
+syntax match ttSessionName "[^ ;]\+"
+			\ contained
+
 syntax region ttSessionNameBlock
+			\ matchgroup=ttBraces start=/{/ end=/}/
+			\ contained
+
+syntax match ttSesSessionName "[^ ;]\+"
+			\ contained
+			\ skipwhite
+			\ nextgroup=ttSessionURIBlock,ttSessionURI
+
+syntax region ttSesSessionNameBlock
 			\ matchgroup=ttBraces start=/{/ end=/}/
 			\ contained
 			\ skipwhite
 			\ nextgroup=ttSessionURIBlock,ttSessionURI
 
-syntax match ttSessionName "\<\S\+\>"
+syntax match ttRunSessionName "[^ ;]\+"
 			\ contained
 			\ skipwhite
-			\ nextgroup=ttSessionURIBlock,ttSessionURI
+			\ nextgroup=ttShellCmd
 
 syntax region ttRunSessionNameBlock
 			\ matchgroup=ttBraces start=/{/ end=/}/
@@ -590,10 +596,10 @@ syntax region ttRunSessionNameBlock
 			\ skipwhite
 			\ nextgroup=ttShellCmd
 
-syntax match ttRunSessionName "\<\S\+\>"
+syntax match ttSessionURI "[^ ;]\+"
 			\ contained
 			\ skipwhite
-			\ nextgroup=ttShellCmd
+			\ nextgroup=ttSessionPortBlock,ttSessionPort
 
 syntax region ttSessionURIBlock
 			\ matchgroup=ttBraces start=/{/ end=/}/
@@ -601,30 +607,25 @@ syntax region ttSessionURIBlock
 			\ skipwhite
 			\ nextgroup=ttSessionPortBlock,ttSessionPort
 
-syntax match ttSessionURI "\<\S\+\>"
+syntax match ttSessionPort "[^ ;]\+"
 			\ contained
-			\ skipwhite
-			\ nextgroup=ttSessionPortBlock,ttSessionPort
 
 syntax region ttSessionPortBlock
 			\ matchgroup=ttBraces start=/{/ end=/}/
 			\ contained
-
-syntax match ttSessionPort "\<\S\+\>"
-			\ contained
 " }}}
 " History Block {{{ 
-syntax match ttHistSub1 "\%[{]\(delete\|list\)\%[}]"
+syntax match ttHistSub1 "\c\%[{]\(delete\|list\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 
-syntax match ttHistSub2 "\%[{]insert\%[}]"
+syntax match ttHistSub2 "\c\%[{]insert\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
 			\ nextgroup=ttValueBlock
 
-syntax match ttHistSub3 "\%[{]\(write\|read\)\%[}]"
+syntax match ttHistSub3 "\c\%[{]\(write\|read\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
@@ -659,43 +660,28 @@ syntax region ttConfigBlock
 			\ matchgroup=ttBraces start=/{/ end=/}/
 			\ contained
 " }}}
-" Script Block: {{{
-syntax match ttScriptVarName /\S\+\_s*{/
-			\ contained
-			\ keepend
-			\ contains=ttScriptVarNameVar,ttSubBrace
-			\ skipempty skipwhite
-			\ nextgroup=ttScriptShell
-
-syntax match ttScriptVarNameVar /[A-Za-z_0-9]\+/
-			\ contained
-
-syntax region ttScriptShell start=// skip=/$/ end=/}$\|};$/
-			\ contained
-			\ contains=ttSubBrace,ttShellCmd
-" }}}
 " Line Block {{{ 
-syntax match ttLineSub1 "\%[{]\(gag\)\%[}]"
+syntax match ttLineSub1 "\c\%[{]\(gag\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 
-syntax match ttLineSub2 "\%[{]\(strip\|ignore\|verbose\)\%[}]"
+syntax match ttLineSub2 "\c\%[{]\(strip\|ignore\|verbose\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 
-syntax match ttLineSub3 "\%[{]\(sub\%[titute]\)\%[}]"
+syntax match ttLineSub3 "\c\%[{]\(sub\%[titute]\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
 			\ nextgroup=ttLineSubSub
 
-syntax match ttLineSub4 "\%[{]\(log\%[verbatim]\)\%[}]"
+syntax match ttLineSub4 "\c\%[{]\(log\%[verbatim]\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
 			\ nextgroup=ttFileNameBlock,ttFileName
 
-syntax match ttLineSubSub "\%[{]\(var\%[iables]\|functions\|colors\|escapes\|secure\|eol\|lnf\)\%[}]"
+syntax match ttLineSubSub "\c\%[{]\(var\%[iables]\|functions\|colors\|escapes\|secure\|eol\|lnf\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 " }}}
@@ -724,14 +710,6 @@ syntax region ttErrorBlock
 " }}}
 
 " Syntax Elements {{{
-" Optional SubCommand Braces {{{
-syntax match ttSubBrace "{\|}"
-			\ contained
-" }}}
-" Command Terminator {{{
-syntax match ttCmdSep /;/
-			\ containedin=ttCodeBlock,ttFuncBlock,ttForAllBlock,ttForEachBlock
-" }}}
 " Numbers {{{
 syntax match ttInt "\d\+"
 			\ containedin=ttCodeBlock,ttValueBlock,ttTimeNameBlock,ttExpressionBlock,ttVarIndex,ttLoopLowerBlock,ttLoopUpperBlock,ttFuncBlock,ttSessionPort,ttSessionPortBlock
@@ -821,6 +799,7 @@ syntax region ttVarIndex
 			\ matchgroup=ttVarIndexBracket start=/\[/ end=/\]/ 
 			\ contained
 			\ containedin=ttVarBlock
+			\ transparent
 			\ nextgroup=ttVarIndex
 " }}}
 " @function calls and the obligatory braces around the arguments {{{
@@ -832,6 +811,14 @@ syntax region ttFuncBlock
 syntax match ttFunction "@[A-Za-z_0-9]\+" 
 			\ containedin=ALLBUT,ttComment,ttNopComment
 			\ nextgroup=ttFuncBlock
+" }}}
+" Optional SubCommand Braces {{{
+syntax match ttSubBrace "{\|}"
+			\ contained
+" }}}
+" Command Terminator {{{
+syntax match ttCmdSep /;/
+			\ containedin=ttCodeBlock,ttFuncBlock,ttForAllBlock,ttForEachBlock
 " }}}
 " }}}
 
@@ -912,7 +899,6 @@ hi link ttLineSubSub              ttKeyword
 
 hi link ttSessionURIBlock         ttSessionURI
 hi link ttSessionURI              ttString
-
 " Link all Braces together {{{
 hi link ttBracesMatch             ttBraces
 hi link ttBracesFormat            ttBraces
@@ -924,7 +910,6 @@ hi link ttOperatorsParen          ttBraces
 hi link ttSubBrace                ttBraces
 " }}}
 hi link ttBracesFunction          ttFunction
-
 " Link Various Variable Names to ttVarName {{{
 hi link ttLoopVarBlock            ttVarName
 hi link ttMathVarBlock            ttVarName
@@ -943,42 +928,35 @@ hi link ttListVar                 ttVarName
 hi link ttPathVar                 ttVarName
 hi link ttScriptVarNameVar        ttVarName
 " }}}
-
 " Link all pattern blocks together {{{
 hi link ttPatternBlockHigh        ttPatternBlock
 hi link ttPatternBlockSub         ttPatternBlock
 " }}}
-
 " Link all names to ttIdentifier {{{
 hi link ttClassName               ttIdentifier
 hi link ttClassNameBlock          ttIdentifier
 hi link ttTimeNameBlock           ttIdentifier
-hi link ttSessionNameBlock        ttIdentifier
 hi link ttSessionName             ttIdentifier
-hi link ttRunSessionNameBlock     ttIdentifier
+hi link ttSessionNameBlock        ttIdentifier
+hi link ttSesSessionName          ttIdentifier
+hi link ttSesSessionNameBlock     ttIdentifier
 hi link ttRunSessionName          ttIdentifier
+hi link ttRunSessionNameBlock     ttIdentifier
 hi link ttUnBlock                 ttIdentifier
 hi link ttUn                      ttIdentifier
 " }}}
-
 " Link various number types to ttNumber {{{
 hi link ttInt                     ttNumber
 hi link ttFloat                   ttNumber
 " }}}
-
 hi link ttFunctionNameBlock       ttFunction
-
 hi link ttFileNameBlock           ttFileName
-
 hi link ttScriptShell             ttShellCmd
-
 hi link ttVarBlock                ttVar
 hi link ttVarBraces               ttVar
-
 hi link ttNopComment              ttComment
 hi link ttNop                     ttCmd
 hi link ttCommentError            ttError
-
 hi link ttErrorBlock              ttError
 " }}}
 
