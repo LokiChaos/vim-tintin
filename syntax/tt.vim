@@ -717,7 +717,7 @@ syntax match ttFloat "\d\+.\d\+"
 			\ containedin=ttCodeBlock,ttValueBlock,ttTimeNameBlock,ttExpressionBlock,ttVarIndex,ttLoopLowerBlock,ttLoopUpperBlock,ttFuncBlock,ttSessionPort,ttSessionPortBlock
 " }}}
 " Lazy Match Patterns {{{
-syntax match ttMatchLazy "%[wWdDsS?.+*]"
+syntax match ttMatchLazy "%[iIwWdDsS?.+*]"
 			\ contained
 			\ containedin=ttPatternBlock,ttPatternBlockHigh,ttPatternBlockSub,ttUn,ttUnBlock,ttReplaceFormatBlock,ttString
 " }}}
