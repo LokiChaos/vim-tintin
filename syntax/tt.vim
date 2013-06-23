@@ -135,7 +135,7 @@ syntax keyword ttCmdInput #macro
 			\ skipwhite skipempty
 
 syntax keyword ttCmdInput #hist[ory]
-			\ nextgroup=ttHistSub1,ttHistSub2,ttHistSub3
+			\ nextgroup=ttHistSub
 			\ skipwhite skipempty
 
 syntax keyword ttCmdInput #cursor
@@ -143,7 +143,7 @@ syntax keyword ttCmdInput #cursor
 			\ skipwhite skipempty
 
 syntax keyword ttCmdInput #buffer
-			\ nextgroup=ttBufferSub1,ttBufferSub2,ttBufferSub3
+			\ nextgroup=ttBufferSub
 			\ skipwhite skipempty
 " }}}
 " Switch/Case: #switch #case #default {{{
@@ -220,7 +220,7 @@ syntax keyword ttCmd #echo
 " }}}
 " Path: #path {{{ 
 syntax keyword ttCmd #path
-			\ nextgroup=ttPathSub1,ttPathSub2,ttPathSub3
+			\ nextgroup=ttPathSub
 			\ skipwhite skipempty
 " }}}
 " Log: #log {{{ 
@@ -230,7 +230,7 @@ syntax keyword ttCmd #log
 " }}}
 " Line: #line {{{ 
 syntax keyword ttCmd #line
-			\ nextgroup=ttLineSub1,ttLineSub2,ttLineSub3,ttLineSub4
+			\ nextgroup=ttLineSub
 			\ skipwhite skipempty
 " }}}
 " UnCommands: #un* {{{
@@ -247,8 +247,11 @@ syntax match ttCmdRep "#{\d\+}"
 " #script is handled in a special way {{{
 syntax keyword ttCmdScript #script
 " }}}
-
+" Map: #map {{{
 syntax keyword ttCmd #map
+			\ nextgroup=ttMapSub
+			\ skipwhite skipempty
+" }}}
 syntax keyword ttCmd #chat
 " }}}
 syntax case match
@@ -491,19 +494,19 @@ syntax region ttTimeNameBlock
 syntax match ttClassName "[^ ;]\+"
 			\ contained
 			\ skipwhite
-			\ nextgroup=ttClassSub1,ttClassSub2
+			\ nextgroup=ttClassSub
 
 syntax region ttClassNameBlock
 			\ matchgroup=ttBraces start=/{/ end=/}/
 			\ contained
 			\ skipwhite
-			\ nextgroup=ttClassSub1,ttClassSub2
+			\ nextgroup=ttClassSub
 
-syntax match ttClassSub1 "\c\%[{]\(open\|close\|kill\)\%[}]"
+syntax match ttClassSub "\c\%[{]\(open\|close\|kill\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 
-syntax match ttClassSub2 "\c\%[{]\(read\|write\)\%[}]"
+syntax match ttClassSub "\c\%[{]\(read\|write\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
@@ -514,18 +517,79 @@ syntax match ttListSub "\c\%[{]\(add\|cl\%[ear]\|create\|del\%[ete]\|ins\%[ert]\
 			\ contained
 			\ contains=ttSubBrace
 " }}}
-" Path Block {{{ 
-syntax match ttPathSub1 "\c\%[{]\(end\|del\|new\|run\|show\|walk\|zip\|unzip\)\%[}]"
+" Map Block {{{ 
+syntax match ttMapSub "\c\%[{]\(at\|create\|destroy\|info\|jump\|find\|flag\|get\|goto\|leave\|legend\|list\|map\|name\|resize\|return\|run\|undo\|vnum\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 
-syntax match ttPathSub2 "\c\%[{]\(load\|save\)\%[}]"
+syntax match ttMapSub "\c\%[{]\(read\|write\)\%[}]"
+			\ contained
+			\ contains=ttSubBrace
+			\ skipwhite skipempty
+			\ nextgroup=ttFileNameBlock,ttFileName
+
+syntax match ttMapSub "\c\%[{]color\%[}]"
+			\ contained
+			\ contains=ttSubBrace
+			\ skipwhite skipempty
+			\ nextgroup=ttMapSubSubColor
+
+syntax match ttMapSub "\c\%[{]flag\%[}]"
+			\ contained
+			\ contains=ttSubBrace
+			\ skipwhite skipempty
+			\ nextgroup=ttMapSubSubFlag
+
+syntax match ttMapSub "\c\%[{]\(delete\|dig\|exit\%[flag]\|explore\|insert\|link\|move\|travel\|uninsert\|unlink\)\%[}]"
+			\ contained
+			\ contains=ttSubBrace
+			\ skipwhite skipempty
+			\ nextgroup=ttMapSubSubDirection
+
+syntax match ttMapSub "\c\%[{]roomflag\%[}]"
+			\ contained
+			\ contains=ttSubBrace
+			\ skipwhite skipempty
+			\ nextgroup=ttMapSubSubRoomFlag
+
+syntax match ttMapSub "\c\%[{]set\%[}]"
+			\ contained
+			\ contains=ttSubBrace
+			\ skipwhite skipempty
+			\ nextgroup=ttMapSubSubSet
+
+syntax match ttMapSubSubColor "\c\%[{]\(exit\|here\|path\|room\)\%[}]"
+			\ contained
+			\ contains=ttSubBrace
+
+syntax match ttMapSubSubFlag "\c\%[{]\(asciigraphics\|asciivnums\|mudfont\|nofollow\|static\|symbolgraphics\|vtmap\|vtgraphics\)\%[}]"
+			\ contained
+			\ contains=ttSubBrace
+
+syntax match ttMapSubSubDirection "\c\%[{]\(ne\|nw\|se\|sw\|n\|s\|e\|w\|w\|u\|d\)\%[}]"
+			\ contained
+			\ contains=ttSubBrace
+
+syntax match ttMapSubSubRoomFlag "\c\%[{]\(avoid\|hide\|leave\|void\|static\)\%[}]"
+			\ contained
+			\ contains=ttSubBrace
+
+syntax match ttMapSubSubSet "\c\%[{]room\(area\|color\|data\|desc\|flags\|name\|note\|symbol\|terrain\|weight\)\%[}]"
+			\ contained
+			\ contains=ttSubBrace
+" }}}
+" Path Block {{{ 
+syntax match ttPathSub "\c\%[{]\(end\|del\|new\|run\|show\|walk\|zip\|unzip\)\%[}]"
+			\ contained
+			\ contains=ttSubBrace
+
+syntax match ttPathSub "\c\%[{]\(load\|save\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
 			\ nextgroup=ttPathVarBlock,ttPathVar
 
-syntax match ttPathSub3 "\c\%[{]\(ins\%[ert]\)\%[}]"
+syntax match ttPathSub "\c\%[{]\(ins\%[ert]\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
@@ -539,17 +603,17 @@ syntax match ttLogSub "\c\%[{]\(a\%[ppend]\|ov\%[erwrite]\|of\%[f]\)\%[}]"
 			\ nextgroup=ttFileNameBlock,ttFileName
 " }}}
 " Buffer Block {{{ 
-syntax match ttBufferSub1 "\c\%[{]\(clear\|down\|end\|find\|home\|info\|lock\|up\)\%[}]"
+syntax match ttBufferSub "\c\%[{]\(clear\|down\|end\|find\|home\|info\|lock\|up\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 
-syntax match ttBufferSub2 "\c\%[{]write\%[}]"
+syntax match ttBufferSub "\c\%[{]write\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
 			\ nextgroup=ttFileNameBlock,ttFileName
 
-syntax match ttBufferSub3 "\c\%[{]get\%[}]"
+syntax match ttBufferSub "\c\%[{]get\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
@@ -615,17 +679,17 @@ syntax region ttSessionPortBlock
 			\ contained
 " }}}
 " History Block {{{ 
-syntax match ttHistSub1 "\c\%[{]\(delete\|list\)\%[}]"
+syntax match ttHistSub "\c\%[{]\(delete\|list\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 
-syntax match ttHistSub2 "\c\%[{]insert\%[}]"
+syntax match ttHistSub "\c\%[{]insert\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
 			\ nextgroup=ttValueBlock
 
-syntax match ttHistSub3 "\c\%[{]\(write\|read\)\%[}]"
+syntax match ttHistSub "\c\%[{]\(write\|read\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
@@ -661,21 +725,21 @@ syntax region ttConfigBlock
 			\ contained
 " }}}
 " Line Block {{{ 
-syntax match ttLineSub1 "\c\%[{]\(gag\)\%[}]"
+syntax match ttLineSub "\c\%[{]\(gag\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 
-syntax match ttLineSub2 "\c\%[{]\(strip\|ignore\|verbose\)\%[}]"
+syntax match ttLineSub "\c\%[{]\(strip\|ignore\|verbose\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 
-syntax match ttLineSub3 "\c\%[{]\(sub\%[titute]\)\%[}]"
+syntax match ttLineSub "\c\%[{]\(sub\%[titute]\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
 			\ nextgroup=ttLineSubSub
 
-syntax match ttLineSub4 "\c\%[{]\(log\%[verbatim]\)\%[}]"
+syntax match ttLineSub "\c\%[{]\(log\%[verbatim]\)\%[}]"
 			\ contained
 			\ contains=ttSubBrace
 			\ skipwhite
@@ -732,10 +796,10 @@ syntax match ttFormat "%\%[.+-][0-9]\{-}[acdghlmnprstuwACLRTU]"
 			\ containedin=ttFormatBlock,ttEchoBlock
 " }}}
 " RexEx {{{
-syntax match ttRegEx "\(\.\|+\|?\|*\||\)" 
+syntax match ttRegEx "\(\.\|+\|?\|*\|\\.\)" 
 			\ contained
 			\ containedin=ttRegExBlock
-syntax match ttRegExBraces "\()\|(\|\]\|\[\)"
+syntax match ttRegExBraces "\()\|(\|\]\|\[\||\)"
 			\ contained
 			\ containedin=ttRegExBlock
 " }}}
@@ -862,7 +926,7 @@ hi link ttMatchLazy               ttMacro
 hi link ttMatchSpecial            ttMacro
 hi link ttFormat                  ttMacro
 hi link ttRegEx                   ttMacro
-hi link ttRegExBraces             ttMacro
+hi link ttRegExBraces             ttBraces
 hi link ttColor                   ttMacro
 hi link ttEsc                     ttMacro
 hi link ttAnsiEsc                 ttMacro
@@ -876,25 +940,21 @@ hi link ttListNameKill            ttKeyword
 hi link ttListName                ttKeyword
 hi link ttConfigBlock             ttKeyword
 hi link ttListSub                 ttKeyword
-hi link ttPathSub1                ttKeyword
-hi link ttPathSub2                ttKeyword
-hi link ttPathSub3                ttKeyword
+hi link ttPathSub                 ttKeyword
 hi link ttLogSub                  ttKeyword
-hi link ttClassSub1               ttKeyword
-hi link ttClassSub2               ttKeyword
-hi link ttHistSub1                ttKeyword
-hi link ttHistSub2                ttKeyword
-hi link ttHistSub3                ttKeyword
+hi link ttClassSub                ttKeyword
+hi link ttHistSub                 ttKeyword
 hi link ttEventBlock              ttKeyword
 hi link ttCursorBlock             ttKeyword
-hi link ttBufferSub1              ttKeyword
-hi link ttBufferSub2              ttKeyword
-hi link ttBufferSub3              ttKeyword
-hi link ttLineSub1                ttKeyword
-hi link ttLineSub2                ttKeyword
-hi link ttLineSub3                ttKeyword
-hi link ttLineSub4                ttKeyword
+hi link ttBufferSub               ttKeyword
+hi link ttLineSub                 ttKeyword
 hi link ttLineSubSub              ttKeyword
+hi link ttMapSub                  ttKeyword
+hi link ttMapSubSubSet            ttKeyword
+hi link ttMapSubSubColor          ttKeyword
+hi link ttMapSubSubFlag           ttKeyword
+hi link ttMapSubSubRoomFlag       ttKeyword
+hi link ttMapSubSubDirection      ttKeyword
 " }}}
 
 hi link ttSessionURIBlock         ttSessionURI
