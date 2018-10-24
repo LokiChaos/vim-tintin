@@ -170,6 +170,10 @@ syntax keyword ttCmdVar #var[iable]
 			\ nextgroup=ttVarVarBlock,ttVarVar
 			\ skipwhite skipempty
 
+syntax keyword ttCmdVar #loc[al]
+			\ nextgroup=ttVarVarBlock,ttVarVar
+			\ skipwhite skipempty
+
 syntax keyword ttCmdVar #format
 			\ nextgroup=ttFormatVarBlock,ttFormatVar
 			\ skipwhite skipempty
