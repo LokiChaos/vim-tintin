@@ -214,7 +214,7 @@ syntax keyword ttCmd #class
 			\ skipwhite skipempty
 " }}}
 " Local Echos: #echo #showme {{{
-syntax keyword ttCmd #showme
+syntax keyword ttCmd #show[me]
 			\ nextgroup=ttValueBlock
 			\ skipwhite skipempty
 
