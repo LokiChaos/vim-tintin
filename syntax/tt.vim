@@ -56,7 +56,7 @@ syntax keyword ttCmd #config
 			\ nextgroup=ttConfigBlock
 			\ skipwhite skipempty
 
-syntax keyword ttCmd #pathdir
+syntax keyword ttCmd #pathdir #unpathdir
 " }}}
 " End/Suspend: #end #suspend #zap {{{
 syntax keyword ttCmd #end #suspend
